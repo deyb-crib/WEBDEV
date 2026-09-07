@@ -54,6 +54,7 @@ a {
     display: flex;
     align-items: center;
     background: rgba(132, 15, 20, 0.96);
+    border-bottom: 1px solid #690d12;
     border-radius: 0;
     box-shadow: 0 5px 16px rgba(55, 0, 0, 0.3);
     backdrop-filter: blur(8px);
@@ -181,12 +182,98 @@ a {
 }
 
 .signup {
-    background: #ffffff;
-    color: #8b181c;
+    background: #b71922;
+    color: #ffffff;
     padding: 8px 18px;
     border-radius: 8px;
     font-size: 13px;
     font-weight: 600;
+}
+
+.all-hospitals-page {
+    align-items: stretch;
+    min-height: 100vh;
+    background: #fffafa;
+}
+
+.hospitals-header {
+    display: flex;
+    width: min(95%, 1200px);
+    min-height: 62px;
+    align-items: center;
+    justify-content: space-between;
+    margin: 0 auto 24px;
+    padding: 10px 20px;
+    border-radius: 10px;
+    background: #9e1b21;
+    box-shadow: 0 6px 16px rgba(90, 12, 16, 0.16);
+}
+
+.hospitals-brand,
+.hospitals-actions a {
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.hospitals-brand {
+    font-size: 20px;
+    letter-spacing: 0.5px;
+}
+
+.hospitals-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.hospitals-signup {
+    padding: 9px 14px;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #8b181c !important;
+}
+
+.hospitals-main {
+    width: min(95%, 1200px);
+    margin: 0 auto;
+}
+
+.hospitals-intro {
+    padding: 12px 4px 0;
+}
+
+.hospitals-intro h1 {
+    margin: 6px 0;
+    color: #650c11;
+    font-size: clamp(28px, 4vw, 42px);
+}
+
+.hospitals-intro p {
+    max-width: 620px;
+    color: #654c4c;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.hospitals-back {
+    display: inline-flex;
+    gap: 7px;
+    margin-top: 14px;
+    color: #a71920;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.hospitals-list {
+    width: 100%;
+    margin-top: 28px;
+}
+
+.hospitals-count {
+    color: #8b181c;
+    font-size: 12px;
+    font-weight: 700;
 }
 
 /* HERO CONTENT GRID */
@@ -240,6 +327,7 @@ a {
 /* BUTTONS */
 .hero-buttons {
     display: flex;
+    flex-wrap: wrap;
     gap: 24px;
     justify-content: center;
 }
@@ -254,6 +342,27 @@ a {
     font-size: 11px;
     font-weight: 600;
     width: 115px;
+    min-height: 44px;
+    transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.services-btn:hover,
+.about-btn:hover,
+.services-btn:focus-visible,
+.about-btn:focus-visible {
+    transform: translateY(-2px);
+    outline: 2px solid #931c21;
+    outline-offset: 3px;
+}
+
+.services-btn:hover,
+.services-btn:focus-visible {
+    background: #690d12;
+}
+
+.about-btn:hover,
+.about-btn:focus-visible {
+    background: #fff4f4;
 }
 
 .services-btn {
@@ -266,6 +375,11 @@ a {
     background: #ffffff;
     color: #931c21;
     border: 1px solid #931c21;
+}
+
+#services,
+#about {
+    scroll-margin-top: 78px;
 }
 
 .medical-visual {
@@ -418,6 +532,10 @@ a {
     overflow-y: visible;
 }
 
+.centers-section.has-no-results {
+    display: none;
+}
+
 /* Floating Red Blood Cells Graphic */
 .bg-cells {
     position: absolute;
@@ -501,6 +619,16 @@ a {
     object-fit: cover;
 }
 
+.card-image-placeholder {
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, #f8dede, #d98a8e);
+    color: #8b181c;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+}
+
 /* Dark Red Gradient Fade Over Images */
 .card-gradient-overlay {
     position: absolute;
@@ -551,22 +679,394 @@ a {
 /* Bottom Card Action Link */
 .see-availability {
     position: relative;
-    z-index: 3;
+    z-index: 5;
     display: inline-flex;
     align-items: center;
-    gap: 6px;
+    justify-content: center;
+    gap: 8px;
+    min-width: 170px;
+    padding: 10px 18px;
+    border: 1px solid #7d1519;
+    border-radius: 8px;
+    background: linear-gradient(180deg, #8d1a1f 0%, #730d12 100%);
     color: #ffffff;
     font-family: 'Alata', sans-serif;
     font-size: 12px;
-    font-weight: 500;
+    font-weight: 700;
     text-decoration: none;
     margin-top: 14px;
     margin-bottom: 4px;
-    transition: opacity 0.2s ease;
+    cursor: pointer;
+    opacity: 1;
+    pointer-events: auto;
+    appearance: none;
+    -webkit-appearance: none;
+    touch-action: manipulation;
+    box-shadow: 0 4px 10px rgba(73, 0, 4, 0.22);
+    transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
 }
 
-.see-availability:hover {
-    opacity: 0.8;
+.see-availability:hover,
+.see-availability:focus-visible {
+    background: linear-gradient(180deg, #a42128 0%, #851116 100%);
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 7px 16px rgba(73, 0, 4, 0.28);
+    outline: none;
+}
+
+.see-availability:active {
+    transform: translateY(0) scale(0.98);
+}
+
+.see-availability:disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.availability-modal {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.22s ease, visibility 0.22s ease;
+    z-index: 1200;
+    background: rgba(255, 255, 255, 0.18);
+}
+
+.availability-modal.is-visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+
+.availability-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.12);
+    z-index: 0;
+}
+
+.availability-modal-card {
+    position: relative;
+    z-index: 1;
+    width: min(760px, calc(100vw - 32px));
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 8px 0 0;
+    text-align: center;
+}
+
+.availability-close {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border: 1px solid #d8d8d8;
+    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.65);
+    color: #8a8a8a;
+    font-size: 20px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.availability-icon {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    margin: 12px auto 8px;
+    border-radius: 4px;
+    border: 1px solid #d9d9d9;
+    background: rgba(255, 255, 255, 0.5);
+    color: #8a8a8a;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.availability-label {
+    margin: 0 0 8px;
+    color: #8d1e24;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: none;
+}
+
+.availability-modal-card h3 {
+    margin: 0;
+    color: #5b0a12;
+    font-size: clamp(26px, 2.2vw, 38px);
+    line-height: 1.08;
+    font-weight: 700;
+}
+
+.availability-copy {
+    margin: 10px auto 0;
+    max-width: 610px;
+    color: #4d4040;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.availability-details {
+    width: min(100%, 460px);
+    margin: 18px auto 0;
+    padding: 14px 18px;
+    border: 1px solid #ead3d4;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.72);
+    color: #4d4040;
+    font-size: 14px;
+    text-align: left;
+}
+
+.availability-details p {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 6px 0;
+}
+
+.availability-details strong {
+    color: #8d1e24;
+}
+
+.availability-details .availability-open-status {
+    display: block;
+    margin-top: 12px;
+    color: #277242;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+}
+
+.availability-actions {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.availability-booking-form {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    width: min(100%, 620px);
+    margin: 18px auto 0;
+    text-align: left;
+}
+
+.availability-booking-form fieldset {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 18px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.availability-booking-form legend,
+.availability-slot-heading strong {
+    color: #8d1e24;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.availability-booking-form fieldset label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #4d4040;
+    font-weight: 400;
+}
+
+.availability-booking-form fieldset input {
+    width: auto;
+    min-height: auto;
+    margin: 0;
+}
+
+.availability-booking-form label {
+    color: #8d1e24;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.availability-booking-form input,
+.availability-booking-form select {
+    width: 100%;
+    min-height: 36px;
+    margin-top: 5px;
+    padding: 0 10px;
+    border: 1px solid #d4b7b8;
+    border-radius: 6px;
+    background: #ffffff;
+    color: #4d4040;
+    font: inherit;
+}
+
+.availability-booking-form .availability-primary {
+    border: 0;
+    cursor: pointer;
+}
+
+.availability-slot-heading {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+.availability-slot-heading span,
+.availability-slot-legend {
+    color: #6d5a5a;
+    font-size: 11px;
+}
+
+.availability-time-slots {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+}
+
+.availability-time-slot {
+    min-height: 38px;
+    border: 1px solid #b7d5bd;
+    border-radius: 6px;
+    background: #f4fbf5;
+    color: #277242;
+    cursor: pointer;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.availability-time-slot.is-selected {
+    border-color: #8d1e24;
+    background: #8d1e24;
+    color: #ffffff;
+}
+
+.availability-time-slot.is-full,
+.availability-time-slot:disabled {
+    border-color: #d2caca;
+    background: #f1eeee;
+    color: #8a7a7a;
+    cursor: not-allowed;
+}
+
+.availability-slot-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.availability-slot-legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.availability-slot-legend i {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #b7d5bd;
+}
+
+.availability-slot-legend i.is-full {
+    background: #c6bcbc;
+}
+
+.availability-slot-legend i.is-selected {
+    background: #8d1e24;
+}
+
+.availability-no-slots {
+    margin: 0;
+    color: #7b1b22;
+    font-size: 12px;
+}
+
+.booking-result {
+    width: min(680px, calc(100% - 32px));
+    margin: 15vh auto 0;
+    padding: 36px;
+    text-align: center;
+}
+
+.booking-result h1 {
+    margin: 12px auto 24px;
+    color: #5b0a12;
+    font-size: clamp(24px, 4vw, 38px);
+    line-height: 1.15;
+}
+
+.availability-cancel,
+.availability-primary,
+.availability-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 0 16px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-family: 'Alata', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.availability-cancel {
+    border: 1px solid #d4d4d4;
+    background: rgba(255, 255, 255, 0.55);
+    color: #7b1b22;
+    cursor: pointer;
+}
+
+.availability-secondary {
+    border: 1px solid #9e1b21;
+    background: #ffffff;
+    color: #9e1b21;
+}
+
+.availability-primary {
+    background: #9e1b21;
+    color: #ffffff;
+    box-shadow: 0 8px 18px rgba(158, 27, 33, 0.18);
+}
+
+.availability-cancel:hover,
+.availability-primary:hover,
+.availability-cancel:focus-visible,
+.availability-primary:focus-visible {
+    transform: translateY(-1px);
+    outline: none;
+}
+
+.availability-secondary:hover,
+.availability-secondary:focus-visible {
+    background: #f8e7e8;
+    transform: translateY(-1px);
+    outline: none;
 }
 
 /* =========================================
@@ -934,21 +1434,44 @@ a {
     border: 1px solid #f0cccc;
 }
 
+.locator-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 14px;
+}
+
 .outline-action,
 .secondary-action {
+    min-height: 52px;
+    padding: 0 22px;
     border: 1px solid #9e1b21;
     color: #9e1b21;
     background: #ffffff;
+    font-size: 15px;
+    line-height: 1;
+    letter-spacing: 0.01em;
 }
 
 .locator-map {
     position: relative;
-    height: 245px;
+    width: 100%;
+    height: clamp(300px, 32vw, 470px);
+    min-height: 300px;
     overflow: hidden;
     border-radius: 9px;
     background-color: #f3dede;
-    background-image: linear-gradient(30deg, transparent 47%, rgba(255, 255, 255, 0.8) 48%, rgba(255, 255, 255, 0.8) 52%, transparent 53%), linear-gradient(120deg, transparent 47%, rgba(255, 255, 255, 0.65) 48%, rgba(255, 255, 255, 0.65) 52%, transparent 53%);
-    background-size: 150px 120px;
+    border: 1px solid #f0cccc;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
+}
+
+.locator-map iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    filter: saturate(0.8) contrast(1.08);
 }
 
 .map-road {
@@ -994,6 +1517,73 @@ a {
     border-radius: 5px;
     color: #741117;
     font-size: 10px;
+    font-weight: 700;
+}
+
+.map-dialog {
+    width: min(920px, calc(100% - 32px));
+    max-width: none;
+    padding: 24px;
+    border: 1px solid #f0cccc;
+    border-radius: 12px;
+    background: #fff8f8;
+    color: #650c11;
+    box-shadow: 0 18px 60px rgba(90, 12, 16, 0.28);
+}
+
+.map-dialog::backdrop {
+    background: rgba(42, 8, 10, 0.62);
+}
+
+.map-dialog-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 16px;
+}
+
+.map-dialog-header h2 {
+    margin-top: 5px;
+    font-size: 24px;
+}
+
+.map-dialog-close {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 auto;
+    place-items: center;
+    border: 1px solid #9e1b21;
+    border-radius: 50%;
+    background: #ffffff;
+    color: #9e1b21;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.map-frame {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #f3dede;
+}
+
+.map-frame iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.map-external-link {
+    display: inline-flex;
+    gap: 7px;
+    margin-top: 12px;
+    color: #9e1b21;
+    font-size: 12px;
     font-weight: 700;
 }
 
@@ -1542,6 +2132,15 @@ a {
         gap: 14px;
     }
 
+    .locator-actions {
+        width: 100%;
+        justify-content: stretch;
+    }
+
+    .locator-actions .outline-action {
+        flex: 1 1 0;
+    }
+
     .section-heading-row > p {
         text-align: left;
     }
@@ -1551,7 +2150,82 @@ a {
     }
 
     .locator-map {
-        height: 190px;
+        height: clamp(180px, 52vw, 260px);
+        min-height: 180px;
+        aspect-ratio: 16 / 7;
+    }
+
+    .locator-map-overlay {
+        right: 12px;
+        bottom: 12px;
+    }
+
+    .map-view-button {
+        padding: 8px 12px;
+        font-size: 10px;
+    }
+
+    .map-dialog {
+        width: calc(100% - 20px);
+        padding: 16px;
+    }
+
+    .map-dialog-header h2 {
+        font-size: 20px;
+    }
+
+    .map-frame {
+        aspect-ratio: 4 / 5;
+    }
+
+    .availability-modal {
+        align-items: center;
+        padding: 12px;
+        overflow-y: auto;
+    }
+
+    .availability-modal-card {
+        width: min(100%, 420px);
+        max-height: calc(100vh - 24px);
+        overflow-y: auto;
+        padding: 34px 18px 20px;
+        background: #ffffff;
+        border: 1px solid #ead3d4;
+        border-radius: 12px;
+        box-shadow: 0 16px 40px rgba(70, 0, 5, 0.25);
+    }
+
+    .availability-close {
+        top: 10px;
+        right: 10px;
+    }
+
+    .availability-icon {
+        margin-top: 0;
+    }
+
+    .availability-modal-card h3 {
+        font-size: 26px;
+    }
+
+    .availability-copy {
+        max-width: 32rem;
+        font-size: 14px;
+        line-height: 1.4;
+    }
+
+    .availability-actions {
+        align-items: stretch;
+        flex-direction: column-reverse;
+        gap: 8px;
+        margin-top: 18px;
+    }
+
+    .availability-cancel,
+    .availability-primary,
+    .availability-secondary {
+        width: 100%;
+        min-height: 42px;
     }
 
     .appointment-actions,
@@ -1644,6 +2318,14 @@ a {
     .footer-columns {
         grid-template-columns: 1fr;
         gap: 22px;
+    }
+
+    .availability-booking-form .availability-primary {
+        width: 100%;
+    }
+
+    .availability-time-slots {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
@@ -1793,4 +2475,252 @@ a {
 .care-link:hover,
 .care-link:focus-visible {
     color: #A71920;
+}
+
+/* Keep card availability actions above decorative card layers. */
+.center-card .see-availability {
+    position: relative;
+    z-index: 10;
+    display: inline-flex;
+    background: #7d1519 !important;
+    color: #ffffff !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    cursor: pointer;
+}
+
+.center-card .see-availability:hover,
+.center-card .see-availability:focus-visible {
+    background: #a42128 !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 7px 16px rgba(73, 0, 4, 0.28);
+}
+
+/* FIX: SEE AVAILABILITY BUTTON */
+.center-card .see-availability {
+    position: relative;
+    z-index: 9999;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    min-width: 170px;
+    min-height: 44px;
+    padding: 10px 18px;
+
+    background: #7d1519 !important;
+    color: #ffffff !important;
+
+    border: 1px solid #ffffff;
+    border-radius: 6px;
+
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    cursor: pointer;
+
+    position: relative;
+}
+
+.center-card .see-availability span {
+    color: #ffffff !important;
+}
+
+.center-card .see-availability:hover {
+    background: #a42128 !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25);
+}
+
+.center-card .see-availability:active {
+    transform: translateY(0);
+}
+
+/* =====================================
+   KATOC AVAILABILITY POPUP FIX
+===================================== */
+
+.availability-modal {
+    position: fixed !important;
+    inset: 0 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    width: 100% !important;
+    height: 100% !important;
+
+    padding: 20px !important;
+
+    background: rgba(0, 0, 0, 0.45) !important;
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+
+    z-index: 99999 !important;
+
+    transition:
+        opacity 0.2s ease,
+        visibility 0.2s ease;
+}
+
+.availability-modal.is-visible {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+}
+
+.availability-modal-backdrop {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 0 !important;
+}
+
+.availability-modal-card {
+    position: relative !important;
+    z-index: 1 !important;
+
+    width: min(500px, 90vw) !important;
+
+    padding: 35px 30px !important;
+
+    background: #ffffff !important;
+
+    border: 1px solid #ead3d4 !important;
+    border-radius: 16px !important;
+
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
+
+    text-align: center !important;
+}
+
+.availability-modal-card h3 {
+    color: #5b0a12 !important;
+    margin-bottom: 10px !important;
+}
+
+.availability-copy {
+    color: #4d4040 !important;
+}
+
+.availability-actions {
+    position: relative !important;
+    z-index: 5 !important;
+}
+
+.availability-primary,
+.availability-secondary,
+.availability-cancel {
+    cursor: pointer !important;
+}
+
+.booking-step {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.booking-step h4 {
+    margin: 4px 0 2px;
+    color: #5b0a12;
+    font-size: 16px;
+}
+
+.booking-step h4:not(:first-child) {
+    margin-top: 12px;
+}
+
+.booking-step label span {
+    color: #7b6b6b;
+    font-weight: 400;
+}
+
+.booking-step textarea {
+    width: 100%;
+    min-height: 70px;
+    padding: 9px 10px;
+    border: 1px solid #d4b7b8;
+    border-radius: 6px;
+    resize: vertical;
+    color: #4d4040;
+    font: inherit;
+}
+
+.booking-summary {
+    text-align: left;
+}
+
+.booking-summary p {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 4px 0;
+    color: #4d4040;
+    font-size: 13px;
+}
+
+.booking-summary p strong {
+    color: #8d1e24;
+}
+
+.booking-summary-actions,
+.booking-result-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.booking-result > p {
+    color: #4d4040;
+    line-height: 1.5;
+}
+
+.booking-confirmation {
+    width: min(100%, 500px);
+    margin: 22px auto 0;
+    padding: 16px;
+    border: 1px solid #ead3d4;
+    border-radius: 8px;
+    text-align: left;
+}
+
+.booking-confirmation p {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 7px 0;
+    color: #4d4040;
+}
+
+.booking-confirmation strong {
+    color: #8d1e24;
+}
+
+/* Keep the long booking form inside the viewport on phones. */
+@media (max-width: 600px) {
+    .availability-modal {
+        align-items: flex-start !important;
+        padding: 8px 10px !important;
+        overflow-y: auto !important;
+    }
+
+    .availability-modal-card {
+        width: 100% !important;
+        max-height: calc(100dvh - 16px) !important;
+        margin: 0 auto !important;
+        overflow-y: auto !important;
+        overscroll-behavior: contain;
+        scrollbar-gutter: stable;
+    }
 }

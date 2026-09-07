@@ -1,7 +1,14 @@
 <?php
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'httponly' => true,
+    'samesite' => 'Lax',
+]);
 session_start();
 // KATOC landing page.
 $user = $_SESSION['user'] ?? null;
+require_once __DIR__ . '/config/database.php';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -11,7 +18,7 @@ $user = $_SESSION['user'] ?? null;
 
     <title>KATOC | Kidney Access and Treatment Operation Center</title>
 
-    <link rel="stylesheet" href="style.css?v=20260906">
+    <link rel="stylesheet" href="style.css?v=20260907-availability-responsive">
 </head>
 
 <body class="<?= $user ? 'has-dashboard-sidebar' : '' ?>">
@@ -124,10 +131,10 @@ $user = $_SESSION['user'] ?? null;
             <button type="submit" class="search-submit">Find centers <span>&rarr;</span></button>
         </form>
         <div class="search-filters" aria-label="Center search filters">
-            <button type="button" class="filter-chip">Location</button>
-            <button type="button" class="filter-chip">Center or hospital</button>
-            <button type="button" class="filter-chip">Dialysis type</button>
-            <button type="button" class="filter-chip">Operating hours</button>
+            <button type="button" class="filter-chip" data-filter="location" aria-pressed="false">Location</button>
+            <button type="button" class="filter-chip" data-filter="facility" aria-pressed="false">Center or hospital</button>
+            <button type="button" class="filter-chip" data-filter="type" aria-pressed="false">Dialysis type</button>
+            <button type="button" class="filter-chip" data-filter="hours" aria-pressed="false">Operating hours</button>
         </div>
         <p class="search-status" id="search-status" role="status"></p>
     </section>
@@ -207,32 +214,49 @@ $user = $_SESSION['user'] ?? null;
                 <span class="section-eyebrow">DIALYSIS CENTERS NEAR YOU</span>
                 <h2>Locate care with confidence</h2>
             </div>
-            <a href="#centers" class="outline-action">View all centers <span>&rarr;</span></a>
+            <div class="locator-actions">
+                <button type="button" class="outline-action map-open-action" id="open-map-button">View map <span aria-hidden="true">↗</span></button>
+                <a href="#centers" class="outline-action">View all centers <span>&rarr;</span></a>
+            </div>
         </div>
-        <div class="locator-map" aria-label="Illustrated map showing dialysis center locations">
-            <span class="map-road map-road-one"></span>
-            <span class="map-road map-road-two"></span>
-            <span class="map-road map-road-three"></span>
-            <span class="map-pin map-pin-one">+</span>
-            <span class="map-pin map-pin-two">+</span>
-            <span class="map-pin map-pin-three">+</span>
-            <span class="map-pin map-pin-four">+</span>
-            <span class="map-label">Dumaguete care network</span>
+        <div class="locator-map" aria-label="Map showing dialysis center locations">
+            <iframe
+                title="Map of dialysis centers in Dumaguete"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=123.285%2C9.285%2C123.32%2C9.325&amp;layer=mapnik&amp;marker=9.307%2C123.305"
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"></iframe>
         </div>
     </section>
+
+    <dialog class="map-dialog" id="map-dialog" aria-labelledby="map-dialog-title">
+        <div class="map-dialog-header">
+            <div>
+                <span class="section-eyebrow">DUMAGUETE CARE NETWORK</span>
+                <h2 id="map-dialog-title">Dialysis centers near you</h2>
+            </div>
+            <button type="button" class="map-dialog-close" id="close-map-button" aria-label="Close map">&times;</button>
+        </div>
+        <div class="map-frame">
+            <iframe
+                title="Map of dialysis centers in Dumaguete"
+                src="https://www.openstreetmap.org/export/embed.html?bbox=123.285%2C9.285%2C123.32%2C9.325&amp;layer=mapnik&amp;marker=9.307%2C123.305"
+                loading="lazy"></iframe>
+        </div>
+        <a class="map-external-link" href="https://www.openstreetmap.org/?mlat=9.307&amp;mlon=123.305#map=14/9.307/123.305" target="_blank" rel="noopener noreferrer">Open in a new tab <span aria-hidden="true">&rarr;</span></a>
+    </dialog>
 
     <section class="centers-section" id="centers">
         <img src="images/blood-cells.png" alt="" class="bg-cells">
 
         <div class="centers-header">
             <h2 class="centers-title">FIND YOUR MOST SUITABLE PLACE, WE CARE FOR YOUR HEALTH</h2>
-            <a href="#centers" class="view-all-btn">
+            <a href="all-hospitals.php" class="view-all-btn">
                 VIEW ALL <span>&rarr;</span>
             </a>
         </div>
 
         <div class="centers-grid">
-            <div class="center-card">
+            <div class="center-card" data-location="dumaguete city negros oriental" data-facility="center" data-type="hemodialysis" data-hours="open">
                 <div class="card-image-wrapper">
                     <img src="images/hospital1.png" alt="Love Center">
                     <div class="card-gradient-overlay"></div>
@@ -243,12 +267,12 @@ $user = $_SESSION['user'] ?? null;
                     <p class="center-hours">8:00 am - 5:00 pm</p>
                     <p class="center-service">Hemodialysis Available</p>
                 </div>
-                <a href="#appointment" class="see-availability">
+                <button type="button" class="see-availability availability-trigger" data-center="Love Center" data-location="Dumaguete City, Negros Oriental" data-hours="8:00 am - 5:00 pm" data-logged-in="<?= $user ? 'true' : 'false' ?>">
                     See Availability <span>&rarr;</span>
-                </a>
+                </button>
             </div>
 
-            <div class="center-card">
+            <div class="center-card" data-location="dumaguete city negros oriental" data-facility="hospital center" data-type="hemodialysis" data-hours="open">
                 <div class="card-image-wrapper">
                     <img src="images/hospital2.png" alt="Nephrology Center">
                     <div class="card-gradient-overlay"></div>
@@ -259,12 +283,12 @@ $user = $_SESSION['user'] ?? null;
                     <p class="center-hours">8:00 am - 5:00 pm</p>
                     <p class="center-service">Hemodialysis Available</p>
                 </div>
-                <a href="#appointment" class="see-availability">
+                <button type="button" class="see-availability availability-trigger" data-center="Nephrology Center of Dumaguete City Dialysis, Inc." data-location="Dumaguete City, Negros Oriental" data-hours="8:00 am - 5:00 pm" data-logged-in="<?= $user ? 'true' : 'false' ?>">
                     See Availability <span>&rarr;</span>
-                </a>
+                </button>
             </div>
 
-            <div class="center-card">
+            <div class="center-card" data-location="valencia negros oriental" data-facility="center" data-type="hemodialysis" data-hours="open">
                 <div class="card-image-wrapper">
                     <img src="images/hospital3.png" alt="HemoCent">
                     <div class="card-gradient-overlay"></div>
@@ -275,12 +299,96 @@ $user = $_SESSION['user'] ?? null;
                     <p class="center-hours">8:00 am - 5:00 pm</p>
                     <p class="center-service">Hemodialysis Available</p>
                 </div>
-                <a href="#appointment" class="see-availability">
+                <button type="button" class="see-availability availability-trigger" data-center="HemoCent" data-location="Valencia, Negros Oriental" data-hours="8:00 am - 5:00 pm" data-logged-in="<?= $user ? 'true' : 'false' ?>">
                     See Availability <span>&rarr;</span>
-                </a>
+                </button>
             </div>
+
         </div>
     </section>
+
+    <div class="availability-modal" id="availability-modal" aria-hidden="true">
+        <div class="availability-modal-backdrop" data-close-availability-modal="true"></div>
+        <div class="availability-modal-card" role="dialog" aria-modal="true" aria-labelledby="availability-modal-title">
+            <button type="button" class="availability-close" aria-label="Close sign-up prompt" data-close-availability-modal="true">&times;</button>
+            <div class="availability-icon" aria-hidden="true">+</div>
+            <p class="availability-label" id="availability-modal-label">Member access required</p>
+            <h3 id="availability-modal-title">Sign in or sign up first</h3>
+            <p class="availability-copy" id="availability-modal-copy">Please log in or create an account to check dialysis center availability and book an appointment.</p>
+            <div class="availability-details" id="availability-details" hidden>
+                <p><strong>Location</strong> <span id="availability-location"></span></p>
+                <p><strong>Operating Hours</strong> <span id="availability-hours"></span></p>
+                <p class="availability-open-status">Availability is currently open for requests.</p>
+            </div>
+            <form class="availability-booking-form" id="availability-booking-form" action="booking/create.php" method="post" hidden>
+                <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(getCsrfToken(), ENT_QUOTES, 'UTF-8') ?>">
+                <input type="hidden" name="center" id="availability-booking-center">
+                <input type="hidden" name="location" id="availability-booking-location">
+                <input type="hidden" name="hours" id="availability-booking-hours">
+                <section class="booking-step" id="availability-booking-details-step">
+                    <h4>Appointment Details</h4>
+                <fieldset>
+                    <legend>Dialysis Type</legend>
+                    <label><input type="radio" name="dialysis_type" value="Hemodialysis" required> Hemodialysis</label>
+                    <label><input type="radio" name="dialysis_type" value="Peritoneal Dialysis"> Peritoneal Dialysis</label>
+                </fieldset>
+                <label for="availability-booking-date">Preferred date</label>
+                <input type="date" name="date" id="availability-booking-date" required>
+                <label for="availability-booking-session">Preferred Session</label>
+                <select name="session" id="availability-booking-session" required>
+                    <option value="">Select a session</option>
+                    <option value="Morning">Morning</option>
+                    <option value="Afternoon">Afternoon</option>
+                    <option value="Evening">Evening</option>
+                </select>
+                <div class="availability-slot-heading"><strong>Preferred Time</strong><span>Available time slots</span></div>
+                <div class="availability-time-slots" id="availability-time-slots" role="group" aria-label="Available appointment times"></div>
+                <input type="hidden" name="time" id="availability-booking-time" required>
+                <div class="availability-slot-legend" aria-label="Time slot status"><span><i class="is-available"></i> Available</span><span><i class="is-full"></i> Fully booked</span><span><i class="is-selected"></i> Selected</span></div>
+                <button type="button" class="availability-primary" id="availability-review-button">Continue to review</button>
+                </section>
+                <section class="booking-step" id="availability-patient-step" hidden>
+                    <h4>Patient Information</h4>
+                    <label for="availability-patient-name">Full Name</label>
+                    <input type="text" name="patient_name" id="availability-patient-name" value="<?= htmlspecialchars($user['name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+                    <label for="availability-patient-contact">Contact Number</label>
+                    <input type="tel" name="patient_contact" id="availability-patient-contact" placeholder="Enter contact number" required>
+                    <label for="availability-patient-email">Email Address</label>
+                    <input type="email" name="patient_email" id="availability-patient-email" value="<?= htmlspecialchars($user['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+                    <h4>Emergency Contact</h4>
+                    <label for="availability-emergency-name">Name</label>
+                    <input type="text" name="emergency_name" id="availability-emergency-name" required>
+                    <label for="availability-emergency-contact">Contact Number</label>
+                    <input type="tel" name="emergency_contact" id="availability-emergency-contact" required>
+                    <label for="availability-notes">Additional Notes <span>(optional)</span></label>
+                    <textarea name="notes" id="availability-notes" placeholder="Enter any important information you would like the dialysis center to know."></textarea>
+                    <button type="button" class="availability-primary" id="availability-summary-button">Review Appointment</button>
+                </section>
+                <section class="booking-step booking-summary" id="availability-summary-step" hidden>
+                    <h4>Appointment Summary</h4>
+                    <p><strong>Dialysis Center:</strong> <span data-summary="center"></span></p>
+                    <p><strong>Location:</strong> <span data-summary="location"></span></p>
+                    <p><strong>Dialysis Type:</strong> <span data-summary="dialysis_type"></span></p>
+                    <p><strong>Date:</strong> <span data-summary="date"></span></p>
+                    <p><strong>Session:</strong> <span data-summary="session"></span></p>
+                    <p><strong>Time:</strong> <span data-summary="time"></span></p>
+                    <p><strong>Patient:</strong> <span data-summary="patient_name"></span></p>
+                    <p><strong>Contact:</strong> <span data-summary="patient_contact"></span></p>
+                    <div class="booking-summary-actions">
+                        <button type="button" class="availability-cancel" id="availability-back-button">Back / Edit</button>
+                        <button type="submit" class="availability-primary">Confirm Appointment</button>
+                    </div>
+                </section>
+            </form>
+            <div class="availability-actions" id="availability-actions">
+                <button type="button" class="availability-cancel" data-close-availability-modal="true">Maybe later</button>
+                <?php if (!$user): ?>
+                    <a href="login/login.php" class="availability-secondary">Log in</a>
+                    <a href="login/signup.php" class="availability-primary">Create account</a>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
 
     <!-- =========================
          KIDNEY HEALTH INFORMATION
@@ -477,7 +585,7 @@ $user = $_SESSION['user'] ?? null;
         </div>
     </section>
 
-    <script src="script.js?v=20260907"></script>
+    <script src="script.js?v=20260907-booking-v3"></script>
 
 </body>
 </html>

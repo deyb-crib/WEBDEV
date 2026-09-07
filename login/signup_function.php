@@ -1,4 +1,10 @@
 <?php
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'httponly' => true,
+    'samesite' => 'Lax',
+]);
 session_start();
 require_once __DIR__ . '/../config/database.php';
 
@@ -12,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = (string) ($_POST['password'] ?? '');
     $confirmPassword = (string) ($_POST['confirm_password'] ?? '');
 
-    if (mb_strlen($name) < 2) {
+    if (strlen($name) < 2) {
         $errors[] = 'Enter your full name.';
     }
 

@@ -298,6 +298,217 @@ a {
     font-weight: 700;
 }
 
+.dashboard-appointments {
+    margin-top: 34px;
+}
+
+.dashboard-section-heading h2 {
+    margin-top: 8px;
+    color: var(--dark-red);
+    font-size: 24px;
+}
+
+.dashboard-message,
+.dashboard-empty {
+    margin-top: 14px;
+    padding: 14px 16px;
+    border: 1px solid #f0cece;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #665252;
+    font-size: 12px;
+}
+
+.appointment-list {
+    display: grid;
+    gap: 14px;
+    margin-top: 16px;
+}
+
+.appointment-card {
+    padding: 20px;
+    border: 1px solid #f0cece;
+    border-left: 4px solid var(--red);
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 7px 18px rgba(105, 13, 18, 0.08);
+}
+
+.appointment-card-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+}
+
+.appointment-reference {
+    color: var(--red);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.appointment-card h3 {
+    margin-top: 5px;
+    color: var(--dark-red);
+    font-size: 17px;
+}
+
+.appointment-status {
+    padding: 5px 8px;
+    border-radius: 5px;
+    background: #fff3d8;
+    color: #8a5a00;
+    font-size: 10px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.appointment-status.status-confirmed {
+    background: #e7f6ea;
+    color: #277242;
+}
+
+.appointment-status.status-completed {
+    background: #e9eef8;
+    color: #3f587d;
+}
+
+.appointment-status.status-cancelled {
+    background: #f2eded;
+    color: #7b6b6b;
+}
+
+.appointment-card-details {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-top: 18px;
+}
+
+.appointment-card-details p,
+.appointment-details p {
+    color: #665252;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.appointment-card-details strong {
+    display: block;
+    margin-bottom: 3px;
+    color: var(--red);
+    font-size: 10px;
+}
+
+.appointment-details {
+    margin-top: 16px;
+    color: var(--red);
+    font-size: 11px;
+}
+
+.appointment-details summary {
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.appointment-details p {
+    margin-top: 7px;
+}
+
+.appointment-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 9px;
+    margin-top: 16px;
+}
+
+.appointment-actions form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.appointment-action,
+.appointment-reschedule-form input,
+.appointment-reschedule-form select {
+    min-height: 32px;
+    padding: 0 10px;
+    border: 1px solid #d9bfc0;
+    border-radius: 5px;
+    background: #ffffff;
+    color: var(--red);
+    font: inherit;
+    font-size: 11px;
+    cursor: pointer;
+}
+
+.appointment-action-danger {
+    border-color: #c89494;
+    color: #8d1e24;
+}
+
+.appointment-action:hover,
+.appointment-action:focus-visible {
+    background: var(--pink);
+    outline: none;
+}
+
+.cancel-modal {
+    position: fixed;
+    z-index: 30;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 20px;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+}
+
+.cancel-modal.is-visible {
+    visibility: visible;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.cancel-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(67, 45, 45, 0.3);
+}
+
+.cancel-modal-card {
+    position: relative;
+    z-index: 1;
+    width: min(420px, 100%);
+    padding: 26px;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 18px 44px rgba(105, 13, 18, 0.22);
+    text-align: center;
+}
+
+.cancel-modal-card h2 {
+    color: var(--dark-red);
+    font-size: 22px;
+}
+
+.cancel-modal-card p {
+    margin-top: 10px;
+    color: #665252;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.cancel-modal-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+}
+
 @media (max-width: 700px) {
     .dashboard-header {
         padding: 10px 16px;
@@ -344,5 +555,19 @@ a {
 
     .dashboard-grid {
         grid-template-columns: 1fr;
+    }
+
+    .appointment-card-header,
+    .appointment-card-details {
+        display: block;
+    }
+
+    .appointment-status {
+        display: inline-block;
+        margin-top: 10px;
+    }
+
+    .appointment-card-details p {
+        margin-top: 10px;
     }
 }

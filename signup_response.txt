@@ -1,0 +1,6 @@
+<br />
+<b>Fatal error</b>:  Uncaught Error: Call to undefined function mb_strlen() in C:\xampp\htdocs\WEBDEV\login\signup_function.php:15
+Stack trace:
+#0 C:\xampp\htdocs\WEBDEV\login\signup.php(2): require()
+#1 {main}
+  thrown in <b>C:\xampp\htdocs\WEBDEV\login\signup_function.php</b> on line <b>15</b><br />

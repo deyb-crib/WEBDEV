@@ -7,6 +7,15 @@ if (!isset($_SESSION['user'])) {
 }
 
 $user = $_SESSION['user'];
+require_once __DIR__ . '/../config/database.php';
+
+$appointments = [];
+$dashboardMessage = trim((string) ($_GET['message'] ?? ''));
+try {
+    $appointments = getMySqlAppointmentsForUser((int) $user['id']);
+} catch (PDOException $exception) {
+    $dashboardMessage = 'Appointments are temporarily unavailable. Please try again later.';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -80,7 +89,82 @@ $user = $_SESSION['user'];
                 <span class="dashboard-card-link">Read guide &rarr;</span>
             </a>
         </section>
+
+        <section class="dashboard-appointments" id="appointments">
+            <div class="dashboard-section-heading">
+                <div>
+                    <span class="dashboard-eyebrow">APPOINTMENTS</span>
+                    <h2>Your appointment requests</h2>
+                </div>
+            </div>
+            <?php if ($dashboardMessage !== ''): ?>
+                <p class="dashboard-message" role="status"><?= htmlspecialchars($dashboardMessage, ENT_QUOTES, 'UTF-8') ?></p>
+            <?php endif; ?>
+            <?php if (!$appointments): ?>
+                <p class="dashboard-empty">You have no appointment requests yet.</p>
+            <?php else: ?>
+                <div class="appointment-list">
+                    <?php foreach ($appointments as $appointment): ?>
+                        <?php $statusClass = strtolower((string) preg_replace('/[^a-z0-9]+/i', '-', $appointment['status'])); ?>
+                        <article class="appointment-card">
+                            <div class="appointment-card-header">
+                                <div>
+                                    <span class="appointment-reference"><?= htmlspecialchars($appointment['appointment_reference'], ENT_QUOTES, 'UTF-8') ?></span>
+                                    <h3><?= htmlspecialchars($appointment['center_name'], ENT_QUOTES, 'UTF-8') ?></h3>
+                                </div>
+                                <span class="appointment-status status-<?= htmlspecialchars($statusClass, ENT_QUOTES, 'UTF-8') ?>"><?= htmlspecialchars($appointment['status'], ENT_QUOTES, 'UTF-8') ?></span>
+                            </div>
+                            <div class="appointment-card-details">
+                                <p><strong>Location</strong><span><?= htmlspecialchars($appointment['center_location'], ENT_QUOTES, 'UTF-8') ?></span></p>
+                                <p><strong>Date</strong><span><?= htmlspecialchars($appointment['appointment_date'], ENT_QUOTES, 'UTF-8') ?></span></p>
+                                <p><strong>Time</strong><span><?= htmlspecialchars(substr($appointment['appointment_time'], 0, 5), ENT_QUOTES, 'UTF-8') ?></span></p>
+                                <p><strong>Dialysis Type</strong><span><?= htmlspecialchars($appointment['dialysis_type'], ENT_QUOTES, 'UTF-8') ?></span></p>
+                            </div>
+                            <details class="appointment-details">
+                                <summary>View Details</summary>
+                                <p>Patient: <?= htmlspecialchars($appointment['patient_name'], ENT_QUOTES, 'UTF-8') ?></p>
+                                <p>Contact: <?= htmlspecialchars($appointment['contact_number'], ENT_QUOTES, 'UTF-8') ?></p>
+                                <p>Session: <?= htmlspecialchars($appointment['session'], ENT_QUOTES, 'UTF-8') ?></p>
+                            </details>
+                            <?php if (in_array($appointment['status'], ['Pending Confirmation', 'Confirmed'], true)): ?>
+                                <div class="appointment-actions">
+                                    <form method="post" action="appointment_action.php" class="cancel-appointment-form">
+                                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(getCsrfToken(), ENT_QUOTES, 'UTF-8') ?>">
+                                        <input type="hidden" name="appointment_id" value="<?= (int) $appointment['id'] ?>">
+                                        <input type="hidden" name="action" value="cancel">
+                                        <button type="submit" class="appointment-action appointment-action-danger">Cancel Appointment</button>
+                                    </form>
+                                    <form method="post" action="appointment_action.php" class="appointment-reschedule-form">
+                                        <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(getCsrfToken(), ENT_QUOTES, 'UTF-8') ?>">
+                                        <input type="hidden" name="appointment_id" value="<?= (int) $appointment['id'] ?>">
+                                        <input type="hidden" name="action" value="reschedule">
+                                        <input type="date" name="date" min="<?= date('Y-m-d') ?>" value="<?= htmlspecialchars($appointment['appointment_date'], ENT_QUOTES, 'UTF-8') ?>" required>
+                                        <select name="time" required>
+                                            <?php foreach (['08:00', '10:00', '13:00', '15:00'] as $time): ?>
+                                                <option value="<?= $time ?>" <?= substr($appointment['appointment_time'], 0, 5) === $time ? 'selected' : '' ?>><?= date('g:i A', strtotime($time)) ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                        <button type="submit" class="appointment-action">Reschedule</button>
+                                    </form>
+                                </div>
+                            <?php endif; ?>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </section>
     </main>
+    <div class="cancel-modal" id="cancel-modal" aria-hidden="true">
+        <div class="cancel-modal-backdrop" data-close-cancel-modal="true"></div>
+        <div class="cancel-modal-card" role="dialog" aria-modal="true" aria-labelledby="cancel-modal-title">
+            <h2 id="cancel-modal-title">Cancel Appointment?</h2>
+            <p>Are you sure you want to cancel this dialysis appointment?</p>
+            <div class="cancel-modal-actions">
+                <button type="button" class="appointment-action" data-close-cancel-modal="true">Keep Appointment</button>
+                <button type="button" class="appointment-action appointment-action-danger" id="confirm-cancel-appointment">Cancel Appointment</button>
+            </div>
+        </div>
+    </div>
     <script src="dashboard.js"></script>
 </body>
 </html>

@@ -1,1 +1,44 @@
-[]
+[
+    {
+        "id": 1,
+        "name": "E2E User",
+        "email": "e2e@example.com",
+        "password_hash": "$2y$12$jB2GzV8TbCYhP5TuIVO4Uup8zGIlShAoAHNOkP5dQ4trQYnOA0962",
+        "created_at": "2026-09-07T14:28:30+00:00"
+    },
+    {
+        "id": 2,
+        "name": "Web Test User",
+        "email": "testuser@example.com",
+        "password_hash": "$2y$12$RvdwTP7iIfhmUxHyFrA4V.Px.xU2ohcLoR43Sy5m25dSYocuxIL2y",
+        "created_at": "2026-09-07T14:45:15+00:00"
+    },
+    {
+        "id": 3,
+        "name": "Web Test User",
+        "email": "browsercheck@example.com",
+        "password_hash": "$2y$12$iKFl8mVrJC7cvsaAHF0lgufbyJkWjqy7QTrhsV7I9t1ZH0ftkkOgW",
+        "created_at": "2026-09-07T14:46:16+00:00"
+    },
+    {
+        "id": 4,
+        "name": "Test User",
+        "email": "realcheck@example.com",
+        "password_hash": "$2y$12$WvklhfkxU.rhG50sBKny1..SRMR08z84W4SuhqmlZ.F8UJL8TxKSC",
+        "created_at": "2026-09-07T14:48:38+00:00"
+    },
+    {
+        "id": 5,
+        "name": "Fresh Browser User",
+        "email": "freshbrowser1788792547072@example.com",
+        "password_hash": "$2y$12$nWsK2jwQebO4e9zPyrq4juJWfEVQFtBCIWa52iMGTU3HjkkhPH5tC",
+        "created_at": "2026-09-07T14:49:07+00:00"
+    },
+    {
+        "id": 6,
+        "name": "Dave",
+        "email": "markdaveopena968@gmail.com",
+        "password_hash": "$2y$10$TF.a9BHKjtodEGZx1r6KFekS9gqjoeNYAFu0UhWzRD7usyfJGVFQi",
+        "created_at": "2026-09-07T16:50:46+02:00"
+    }
+]

@@ -1,20 +1,38 @@
+<?php
+session_set_cookie_params([
+    'lifetime' => 0,
+    'path' => '/',
+    'httponly' => true,
+    'samesite' => 'Lax',
+]);
+session_start();
+$user = $_SESSION['user'] ?? null;
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>About KATOC</title>
-    <link rel="stylesheet" href="about.css">
+    <link rel="stylesheet" href="about.css?v=20260907">
 </head>
 <body>
     <header class="about-header">
         <a href="../index.php" class="about-logo-link">
-            <img src="../images/katoc-logo.png" alt="KATOC" class="about-logo">
+            <img src="../images/katoc-icon.png" alt="KATOC" class="about-logo">
         </a>
-        <nav class="about-nav" aria-label="About navigation">
+        <nav class="about-nav-links" aria-label="Main navigation">
             <a href="../index.php">Home</a>
-            <a href="../login/login.php">Log in</a>
-            <a href="../login/signup.php" class="about-nav-cta">Sign up <span>&rarr;</span></a>
+            <a href="../index.php#why-katoc">Why KATOC</a>
+            <a href="about.php">About</a>
+        </nav>
+        <nav class="about-account" aria-label="Account navigation">
+            <?php if ($user): ?>
+                <a href="../dashboard/dashboard.php">Dashboard</a>
+            <?php else: ?>
+                <a href="../login/login.php">Log in</a>
+                <a href="../login/signup.php" class="about-nav-cta">Sign up <span>&rarr;</span></a>
+            <?php endif; ?>
         </nav>
     </header>
 
