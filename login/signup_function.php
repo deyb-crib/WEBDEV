@@ -7,18 +7,19 @@ session_set_cookie_params([
 ]);
 session_start();
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/request.php';
 
 $errors = [];
 $name = '';
 $email = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = trim((string) ($_POST['name'] ?? ''));
-    $email = trim((string) ($_POST['email'] ?? ''));
-    $password = (string) ($_POST['password'] ?? '');
-    $confirmPassword = (string) ($_POST['confirm_password'] ?? '');
+    $name = requestText($_POST, 'name', 100);
+    $email = strtolower(requestText($_POST, 'email', 254));
+    $password = requestScalar($_POST, 'password');
+    $confirmPassword = requestScalar($_POST, 'confirm_password');
 
-    if (strlen($name) < 2) {
+    if (strlen($name) < 2 || !preg_match('/^[\p{L}\p{M} .\'\-]+$/u', $name)) {
         $errors[] = 'Enter your full name.';
     }
 

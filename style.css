@@ -908,16 +908,26 @@ a {
 }
 
 .availability-booking-form input,
-.availability-booking-form select {
+.availability-booking-form select,
+.availability-booking-form textarea {
     width: 100%;
-    min-height: 36px;
-    margin-top: 5px;
-    padding: 0 10px;
+    min-height: 46px;
+    margin-top: 6px;
+    padding: 12px 14px;
     border: 1px solid #d4b7b8;
-    border-radius: 6px;
+    border-radius: 10px;
     background: #ffffff;
     color: #4d4040;
     font: inherit;
+    font-size: 15px;
+    box-shadow: inset 0 1px 2px rgba(90, 12, 16, 0.02);
+}
+
+.availability-booking-form input:not([type="hidden"]),
+.availability-booking-form select,
+.availability-booking-form textarea {
+    pointer-events: auto;
+    user-select: text;
 }
 
 .availability-booking-form .availability-primary {
@@ -946,15 +956,21 @@ a {
 }
 
 .availability-time-slot {
-    min-height: 38px;
+    min-height: 44px;
     border: 1px solid #b7d5bd;
-    border-radius: 6px;
+    border-radius: 10px;
     background: #f4fbf5;
     color: #277242;
     cursor: pointer;
     font: inherit;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.availability-time-slot:hover:not(:disabled):not(.is-full) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(39, 114, 66, 0.12);
 }
 
 .availability-time-slot.is-selected {
@@ -1471,6 +1487,8 @@ a {
     width: 100%;
     height: 100%;
     border: 0;
+    pointer-events: none;
+    touch-action: none;
     filter: saturate(0.8) contrast(1.08);
 }
 
@@ -2552,8 +2570,9 @@ a {
     inset: 0 !important;
 
     display: flex !important;
-    align-items: center !important;
+    align-items: flex-start !important;
     justify-content: center !important;
+    overflow-y: auto !important;
 
     width: 100% !important;
     height: 100% !important;
@@ -2589,9 +2608,13 @@ a {
     position: relative !important;
     z-index: 1 !important;
 
-    width: min(500px, 90vw) !important;
+    width: min(960px, calc(100vw - 40px)) !important;
+    max-height: calc(100vh - 40px) !important;
+    margin: 20px auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
 
-    padding: 35px 30px !important;
+    padding: 24px 28px !important;
 
     background: #ffffff !important;
 
@@ -2601,6 +2624,137 @@ a {
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
 
     text-align: center !important;
+}
+
+.availability-booking-form {
+    display: grid;
+    grid-template-columns: minmax(0, 68fr) minmax(280px, 32fr);
+    align-items: start;
+    gap: 26px;
+    margin-top: 18px;
+    width: 100%;
+    max-width: none;
+}
+
+.availability-booking-form fieldset {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+.availability-booking-form fieldset label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 8px 12px;
+    border: 1px solid #e7c9c9;
+    border-radius: 999px;
+    background: #fffaf9;
+    color: #4d4040;
+    font-size: 14px;
+    font-weight: 400;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.availability-booking-form fieldset label:hover {
+    border-color: #c74b55;
+    background: #fff4f4;
+}
+
+.availability-booking-form fieldset input {
+    width: auto;
+    min-height: auto;
+    margin: 0;
+    accent-color: #8d1e24;
+}
+
+.availability-modal.has-booking-form .availability-details {
+    display: none;
+}
+
+.availability-booking-form .booking-step {
+    grid-column: 1;
+}
+
+.availability-booking-main {
+    grid-column: 1;
+    min-width: 0;
+    max-height: calc(100vh - 190px);
+    overflow-y: auto;
+    padding: 0 10px 12px 0;
+    scrollbar-width: thin;
+    scrollbar-color: #d4b7b8 transparent;
+}
+
+.availability-booking-aside {
+    grid-column: 2;
+    grid-row: 1;
+    position: sticky;
+    top: 0;
+    align-self: start;
+    min-height: 100%;
+    padding: 24px 22px;
+    border: 1px solid #ead3d4;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #fffaf9 0%, #f9efef 100%);
+    text-align: left;
+    box-shadow: inset 0 0 0 1px rgba(141, 30, 36, 0.04);
+}
+
+.availability-aside-eyebrow {
+    color: #8d1e24;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+}
+
+.availability-booking-aside h4 {
+    margin: 8px 0 18px;
+    color: #5b0a12;
+    font-size: clamp(22px, 2vw, 28px);
+    line-height: 1.15;
+}
+
+.availability-booking-aside dl {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+}
+
+.availability-booking-aside dl div {
+    display: grid;
+    gap: 3px;
+}
+
+.availability-booking-aside dt {
+    color: #8d1e24;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.availability-booking-aside dd {
+    margin: 0;
+    color: #4d4040;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.availability-aside-note {
+    margin: 22px 0 0;
+    padding-top: 14px;
+    border-top: 1px solid #ead3d4;
+    color: #6d5a5a;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.availability-aside-action {
+    width: 100%;
+    margin-top: 22px;
 }
 
 .availability-modal-card h3 {
@@ -2624,6 +2778,8 @@ a {
 }
 
 .booking-step {
+    position: relative;
+    z-index: 2;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -2632,7 +2788,8 @@ a {
 .booking-step h4 {
     margin: 4px 0 2px;
     color: #5b0a12;
-    font-size: 16px;
+    font-size: 18px;
+    line-height: 1.2;
 }
 
 .booking-step h4:not(:first-child) {
@@ -2653,6 +2810,12 @@ a {
     resize: vertical;
     color: #4d4040;
     font: inherit;
+}
+
+#availability-patient-step input,
+#availability-patient-step textarea {
+    position: relative;
+    z-index: 3;
 }
 
 .booking-summary {
@@ -2716,11 +2879,30 @@ a {
     }
 
     .availability-modal-card {
-        width: 100% !important;
-        max-height: calc(100dvh - 16px) !important;
-        margin: 0 auto !important;
-        overflow-y: auto !important;
-        overscroll-behavior: contain;
-        scrollbar-gutter: stable;
+    width: min(1100px, 92vw) !important;
+    height: 55vh !important;
+    margin: 0 auto !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    border-radius: 16px !important;
+}
+
+    .availability-booking-form {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .availability-booking-main {
+        max-height: none;
+        overflow: visible;
+        padding: 0;
+    }
+
+    .availability-booking-aside {
+        order: -1;
+        width: 100%;
     }
 }

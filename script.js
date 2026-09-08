@@ -28,6 +28,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const availabilityBookingCenter = document.querySelector("#availability-booking-center");
     const availabilityBookingLocation = document.querySelector("#availability-booking-location");
     const availabilityBookingHours = document.querySelector("#availability-booking-hours");
+    const availabilityAsideCenter = document.querySelector("#availability-aside-center");
+    const availabilityAsideLocation = document.querySelector("#availability-aside-location");
+    const availabilityAsideHours = document.querySelector("#availability-aside-hours");
     const availabilityBookingDate = document.querySelector("#availability-booking-date");
     const availabilityBookingSession = document.querySelector("#availability-booking-session");
     const availabilityTimeSlots = document.querySelector("#availability-time-slots");
@@ -54,9 +57,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const setPatientStep = (isVisible) => {
         availabilityPatientStep?.toggleAttribute("hidden", !isVisible);
         availabilityPatientStep?.querySelectorAll("input, textarea").forEach((field) => {
-            field.disabled = !isVisible;
+            field.removeAttribute("disabled");
+            field.readOnly = false;
+
+            if (field.dataset.patientRequired === undefined && field.required) {
+                field.dataset.patientRequired = "true";
+            }
+
+            field.required = isVisible && field.dataset.patientRequired === "true";
         });
     };
+
+    const enablePatientField = (event) => {
+        const field = event.target.closest?.("#availability-patient-step input, #availability-patient-step textarea");
+        if (!field) return;
+
+        field.removeAttribute("disabled");
+        field.readOnly = false;
+    };
+
+    availabilityPatientStep?.addEventListener("pointerdown", enablePatientField, true);
+    availabilityPatientStep?.addEventListener("focusin", enablePatientField, true);
 
     const showBookingDetails = () => {
         availabilityDetailsStep?.removeAttribute("hidden");
@@ -68,6 +89,20 @@ document.addEventListener("DOMContentLoaded", () => {
         availabilityDetailsStep?.setAttribute("hidden", "true");
         availabilitySummaryStep?.setAttribute("hidden", "true");
         setPatientStep(true);
+        updateBookingAside();
+    };
+
+    const updateBookingAside = () => {
+        if (!availabilityBookingForm) return;
+        const values = new FormData(availabilityBookingForm);
+        availabilityModal?.querySelectorAll(".availability-booking-aside [data-summary]").forEach((item) => {
+            const key = item.dataset.summary;
+            let value = values.get(key) ?? "";
+            if (key === "time" && value) {
+                value = availabilityTimeSlots?.querySelector(`[data-time="${CSS.escape(value)}"]`)?.textContent ?? value;
+            }
+            item.textContent = value || (key === "patient_name" ? "Not entered" : "Not selected");
+        });
     };
 
     const showSummaryStep = () => {
@@ -85,6 +120,7 @@ document.addEventListener("DOMContentLoaded", () => {
         availabilityDetailsStep?.setAttribute("hidden", "true");
         setPatientStep(false);
         availabilitySummaryStep?.removeAttribute("hidden");
+        updateBookingAside();
     };
 
     const timeSlots = [
@@ -157,6 +193,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 slotButton.classList.add("is-selected");
                 slotButton.setAttribute("aria-pressed", "true");
                 if (availabilityBookingTime) availabilityBookingTime.value = slot.value;
+                updateBookingAside();
             });
             availabilityTimeSlots.append(slotButton);
         });
@@ -166,6 +203,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!availabilityModal) return;
 
         const isLoggedIn = button.dataset.loggedIn === "true";
+        availabilityModal.classList.toggle("has-booking-form", isLoggedIn);
 
         if (!isLoggedIn) {
             availabilityLabel.textContent = "Member access required";
@@ -183,12 +221,16 @@ document.addEventListener("DOMContentLoaded", () => {
             if (availabilityBookingCenter) availabilityBookingCenter.value = button.dataset.center ?? "";
             if (availabilityBookingLocation) availabilityBookingLocation.value = button.dataset.location ?? "";
             if (availabilityBookingHours) availabilityBookingHours.value = button.dataset.hours ?? "";
+            if (availabilityAsideCenter) availabilityAsideCenter.textContent = button.dataset.center ?? "Dialysis Center";
+            if (availabilityAsideLocation) availabilityAsideLocation.textContent = button.dataset.location ?? "";
+            if (availabilityAsideHours) availabilityAsideHours.textContent = button.dataset.hours ?? "";
             if (availabilityBookingDate) {
                 availabilityBookingDate.min = new Date().toISOString().split("T")[0];
             }
             if (availabilityBookingForm) availabilityBookingForm.hidden = false;
             showBookingDetails();
             renderTimeSlots();
+            updateBookingAside();
         }
 
         if (availabilityActions) {
@@ -210,6 +252,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     availabilityBookingSession?.addEventListener("change", renderTimeSlots);
     availabilityBookingDate?.addEventListener("change", renderTimeSlots);
+    availabilityBookingForm?.addEventListener("input", updateBookingAside);
+    availabilityBookingForm?.addEventListener("change", updateBookingAside);
     availabilityReviewButton?.addEventListener("click", showPatientStep);
     availabilitySummaryButton?.addEventListener("click", showSummaryStep);
     availabilityBackButton?.addEventListener("click", showPatientStep);

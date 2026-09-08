@@ -8,6 +8,32 @@ session_set_cookie_params([
 session_start();
 $user = $_SESSION['user'] ?? null;
 require_once __DIR__ . '/config/database.php';
+
+$databaseCenters = [];
+$centerImages = [
+    'Love Center' => 'images/hospital1.png',
+    'Nephrology Center of Dumaguete City Dialysis, Inc.' => 'images/hospital2.png',
+    'HemoCent' => 'images/hospital3.png',
+];
+try {
+    $centerConnection = getMySqlConnection();
+    $databaseCenters = $centerConnection->query("SELECT name, address, operating_hours, dialysis_types, image_path FROM dialysis_centers WHERE status = 'Active' ORDER BY name")->fetchAll();
+} catch (Throwable $exception) {
+    $databaseCenters = [];
+}
+
+if (!$databaseCenters) {
+    $databaseCenters = array_map(
+        static fn (array $center): array => [
+            'name' => $center['name'],
+            'address' => $center['address'],
+            'operating_hours' => $center['operating_hours'],
+            'dialysis_types' => $center['dialysis_types'],
+            'image_path' => $center['image_path'] ?? null,
+        ],
+        getActiveFallbackCenters()
+    );
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,8 +41,8 @@ require_once __DIR__ . '/config/database.php';
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>All Dialysis Hospitals | KATOC</title>
-    <link rel="stylesheet" href="style.css?v=20260907-availability-responsive">
-    <script src="script.js?v=20260907-booking-v3" defer></script>
+    <link rel="stylesheet" href="style.css?v=20260908-booking-layout">
+    <script src="script.js?v=20260908-booking-input-layer" defer></script>
 </head>
 <body class="all-hospitals-page">
     <header class="hospitals-header">
@@ -43,9 +69,27 @@ require_once __DIR__ . '/config/database.php';
         <section class="centers-section hospitals-list" id="centers" aria-label="All dialysis hospitals">
             <div class="centers-header">
                 <h2 class="centers-title">AVAILABLE CARE CENTERS</h2>
-                <span class="hospitals-count">8 centers</span>
+                <span class="hospitals-count"><?= count($databaseCenters) ?: 8 ?> centers</span>
             </div>
             <div class="centers-grid">
+                <?php if ($databaseCenters): ?>
+                    <?php foreach ($databaseCenters as $center): ?>
+                        <?php $imagePath = $center['image_path'] ?: ($centerImages[$center['name']] ?? null); ?>
+                        <article class="center-card">
+                            <div class="card-image-wrapper<?= empty($imagePath) ? ' card-image-placeholder' : '' ?>">
+                                <?php if ($imagePath): ?><img src="<?= htmlspecialchars($imagePath, ENT_QUOTES, 'UTF-8') ?>" alt="<?= htmlspecialchars($center['name'], ENT_QUOTES, 'UTF-8') ?>"><?php else: ?>Photo coming soon<?php endif; ?>
+                                <div class="card-gradient-overlay"></div>
+                            </div>
+                            <div class="center-info-box">
+                                <h3 class="center-name"><?= htmlspecialchars($center['name'], ENT_QUOTES, 'UTF-8') ?></h3>
+                                <p class="center-location"><?= htmlspecialchars($center['address'], ENT_QUOTES, 'UTF-8') ?></p>
+                                <p class="center-hours"><?= htmlspecialchars($center['operating_hours'], ENT_QUOTES, 'UTF-8') ?></p>
+                                <p class="center-service"><?= htmlspecialchars($center['dialysis_types'], ENT_QUOTES, 'UTF-8') ?></p>
+                            </div>
+                            <button type="button" class="see-availability availability-trigger" data-center="<?= htmlspecialchars($center['name'], ENT_QUOTES, 'UTF-8') ?>" data-location="<?= htmlspecialchars($center['address'], ENT_QUOTES, 'UTF-8') ?>" data-hours="<?= htmlspecialchars($center['operating_hours'], ENT_QUOTES, 'UTF-8') ?>" data-logged-in="<?= $user ? 'true' : 'false' ?>">See Availability <span>&rarr;</span></button>
+                        </article>
+                    <?php endforeach; ?>
+                <?php else: ?>
                 <article class="center-card">
                     <div class="card-image-wrapper">
                         <img src="images/hospital1.png" alt="Love Center">
@@ -142,6 +186,7 @@ require_once __DIR__ . '/config/database.php';
                     </div>
                     <button type="button" class="see-availability availability-trigger" data-center="Dumaguete Kidney Institute" data-location="Dumaguete City, Negros Oriental" data-hours="8:00 am - 5:00 pm" data-logged-in="<?= $user ? 'true' : 'false' ?>">See Availability <span>&rarr;</span></button>
                 </article>
+                <?php endif; ?>
             </div>
         </section>
     </main>
@@ -164,12 +209,16 @@ require_once __DIR__ . '/config/database.php';
                 <input type="hidden" name="center" id="availability-booking-center">
                 <input type="hidden" name="location" id="availability-booking-location">
                 <input type="hidden" name="hours" id="availability-booking-hours">
+                <div class="availability-booking-main">
                 <section class="booking-step" id="availability-booking-details-step">
                     <h4>Appointment Details</h4>
                 <fieldset>
                     <legend>Dialysis Type</legend>
                     <label><input type="radio" name="dialysis_type" value="Hemodialysis" required> Hemodialysis</label>
                     <label><input type="radio" name="dialysis_type" value="Peritoneal Dialysis"> Peritoneal Dialysis</label>
+                    <label><input type="radio" name="dialysis_type" value="Home Hemodialysis"> Home Hemodialysis</label>
+                    <label><input type="radio" name="dialysis_type" value="Continuous Ambulatory Peritoneal Dialysis"> Continuous Ambulatory Peritoneal Dialysis</label>
+                    <label><input type="radio" name="dialysis_type" value="Automated Peritoneal Dialysis"> Automated Peritoneal Dialysis</label>
                 </fieldset>
                 <label for="availability-booking-date">Preferred date</label>
                 <input type="date" name="date" id="availability-booking-date" required>
@@ -184,23 +233,22 @@ require_once __DIR__ . '/config/database.php';
                 <div class="availability-time-slots" id="availability-time-slots" role="group" aria-label="Available appointment times"></div>
                 <input type="hidden" name="time" id="availability-booking-time" required>
                 <div class="availability-slot-legend" aria-label="Time slot status"><span><i class="is-available"></i> Available</span><span><i class="is-full"></i> Fully booked</span><span><i class="is-selected"></i> Selected</span></div>
-                <button type="button" class="availability-primary" id="availability-review-button">Continue to review</button>
                 </section>
                 <section class="booking-step" id="availability-patient-step" hidden>
                     <h4>Patient Information</h4>
                     <label for="availability-patient-name">Full Name</label>
-                    <input type="text" name="patient_name" id="availability-patient-name" value="<?= htmlspecialchars($user['name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+                    <input type="text" name="patient_name" id="availability-patient-name" value="<?= htmlspecialchars($user['name'] ?? '', ENT_QUOTES, 'UTF-8') ?>" minlength="2" maxlength="100" pattern="[A-Za-zÀ-ÖØ-öø-ÿ .'-]+" required>
                     <label for="availability-patient-contact">Contact Number</label>
-                    <input type="tel" name="patient_contact" id="availability-patient-contact" placeholder="Enter contact number" required>
+                    <input type="tel" name="patient_contact" id="availability-patient-contact" maxlength="30" pattern="[0-9+() .-]{7,30}" placeholder="Enter contact number" required>
                     <label for="availability-patient-email">Email Address</label>
-                    <input type="email" name="patient_email" id="availability-patient-email" value="<?= htmlspecialchars($user['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>" required>
+                    <input type="email" name="patient_email" id="availability-patient-email" value="<?= htmlspecialchars($user['email'] ?? '', ENT_QUOTES, 'UTF-8') ?>" maxlength="254" required>
                     <h4>Emergency Contact</h4>
                     <label for="availability-emergency-name">Name</label>
-                    <input type="text" name="emergency_name" id="availability-emergency-name" required>
+                    <input type="text" name="emergency_name" id="availability-emergency-name" minlength="2" maxlength="100" pattern="[A-Za-zÀ-ÖØ-öø-ÿ .'-]+" required>
                     <label for="availability-emergency-contact">Contact Number</label>
-                    <input type="tel" name="emergency_contact" id="availability-emergency-contact" required>
+                    <input type="tel" name="emergency_contact" id="availability-emergency-contact" maxlength="30" pattern="[0-9+() .-]{7,30}" required>
                     <label for="availability-notes">Additional Notes <span>(optional)</span></label>
-                    <textarea name="notes" id="availability-notes" placeholder="Enter any important information you would like the dialysis center to know."></textarea>
+                    <textarea name="notes" id="availability-notes" maxlength="1000" placeholder="Enter any important information you would like the dialysis center to know."></textarea>
                     <button type="button" class="availability-primary" id="availability-summary-button">Review Appointment</button>
                 </section>
                 <section class="booking-step booking-summary" id="availability-summary-step" hidden>
@@ -215,9 +263,25 @@ require_once __DIR__ . '/config/database.php';
                     <p><strong>Contact:</strong> <span data-summary="patient_contact"></span></p>
                     <div class="booking-summary-actions">
                         <button type="button" class="availability-cancel" id="availability-back-button">Back / Edit</button>
-                        <button type="submit" class="availability-primary">Confirm Appointment</button>
+                        <button type="submit" class="availability-primary">Book Appointment</button>
                     </div>
                 </section>
+                </div>
+                <aside class="availability-booking-aside" aria-label="Booking details">
+                    <span class="availability-aside-eyebrow">BOOKING DETAILS</span>
+                    <h4 id="availability-aside-center">Dialysis Center</h4>
+                    <dl>
+                        <div><dt>Location</dt><dd id="availability-aside-location" data-summary="location"></dd></div>
+                        <div><dt>Operating hours</dt><dd id="availability-aside-hours" data-summary="hours"></dd></div>
+                        <div><dt>Dialysis type</dt><dd data-summary="dialysis_type">Not selected</dd></div>
+                        <div><dt>Date</dt><dd data-summary="date">Not selected</dd></div>
+                        <div><dt>Session</dt><dd data-summary="session">Not selected</dd></div>
+                        <div><dt>Time</dt><dd data-summary="time">Not selected</dd></div>
+                        <div><dt>Patient</dt><dd data-summary="patient_name">Not entered</dd></div>
+                    </dl>
+                    <p class="availability-aside-note">Your selected appointment details will appear here.</p>
+                    <button type="button" class="availability-primary availability-aside-action" id="availability-review-button">Continue to review</button>
+                </aside>
             </form>
             <div class="availability-actions" id="availability-actions">
                 <button type="button" class="availability-cancel" data-close-availability-modal="true">Maybe later</button>

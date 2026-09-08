@@ -15,15 +15,16 @@ if (!isset($_SESSION['user'])) {
 }
 
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/request.php';
 
-if (!isValidCsrfToken((string) ($_POST['csrf_token'] ?? ''))) {
+if (!isValidCsrfToken(requestScalar($_POST, 'csrf_token'))) {
     http_response_code(403);
     exit('Invalid request token.');
 }
 
 $userId = (int) $_SESSION['user']['id'];
 $appointmentId = filter_input(INPUT_POST, 'appointment_id', FILTER_VALIDATE_INT);
-$action = (string) ($_POST['action'] ?? '');
+$action = requestEnum($_POST, 'action', ['cancel', 'reschedule']);
 $message = 'Unable to update the appointment.';
 
 try {
@@ -36,12 +37,11 @@ try {
             ? 'Appointment cancelled.'
             : 'This appointment can no longer be cancelled.';
     } elseif ($action === 'reschedule') {
-        $date = (string) ($_POST['date'] ?? '');
-        $time = (string) ($_POST['time'] ?? '');
-        $dateObject = DateTime::createFromFormat('Y-m-d', $date);
-        $allowedTimes = ['08:00', '10:00', '13:00', '15:00'];
+        $dateObject = requestDate($_POST, 'date');
+        $date = $dateObject?->format('Y-m-d') ?? '';
+        $time = requestEnum($_POST, 'time', ['08:00', '10:00', '13:00', '15:00', '18:00']);
 
-        if (!$dateObject || $dateObject->format('Y-m-d') !== $date || $date < date('Y-m-d') || !in_array($time, $allowedTimes, true)) {
+        if (!$dateObject || $dateObject->format('Y-m-d') !== $date || $date < date('Y-m-d') || $time === '') {
             $message = 'Please choose a valid future date and time.';
         } else {
             call_user_func('updateMySqlAppointmentSchedule', $appointmentId, $userId, $date, $time);

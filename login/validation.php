@@ -1,4 +1,5 @@
 <?php
+require_once __DIR__ . '/../config/request.php';
 
 function validateRequired(string $value, string $fieldName): ?string
 {
@@ -23,8 +24,8 @@ function validatePasswordStrength(string $value): ?string
 
 function validateLoginInput(array $post): array
 {
-    $email = trim((string) ($post['email'] ?? ''));
-    $password = (string) ($post['password'] ?? '');
+    $email = strtolower(requestText($post, 'email', 254));
+    $password = requestScalar($post, 'password');
 
     $errors = array_filter([
         validateRequired($email, 'Email address'),

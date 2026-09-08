@@ -1,0 +1,9 @@
+<?php
+declare(strict_types=1);
+require_once __DIR__ . '/../includes/auth.php'; require_once __DIR__ . '/../includes/db.php'; requireAdmin();
+require_once __DIR__ . '/../includes/upload.php';
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isValidCsrfToken(requestScalar($_POST, 'csrf_token'))) { http_response_code(403); exit('Invalid request.'); }
+$facilityType = requestText($_POST, 'facility_type', 30) ?: 'Dialysis Center'; $name = requestText($_POST, 'name', 191); $address = requestText($_POST, 'address', 191); $contact = requestText($_POST, 'contact_number', 50); $email = strtolower(requestText($_POST, 'email', 191)); $hours = requestText($_POST, 'operating_hours', 100); $types = requestText($_POST, 'dialysis_types', 191); $machines = filter_var(requestScalar($_POST, 'machine_count'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]); $slots = filter_var(requestScalar($_POST, 'available_slots'), FILTER_VALIDATE_INT, ['options' => ['min_range' => 0]]);
+$imagePath = isset($_FILES['image']) ? storeCenterImage($_FILES['image']) : null;
+if (!in_array($facilityType, ['Hospital', 'Dialysis Center'], true) || $name === '' || $address === '' || $contact === '' || !filter_var($email, FILTER_VALIDATE_EMAIL) || $hours === '' || $types === '' || $machines === false || $slots === false) { header('Location: ../centers.php?message=Please complete valid facility details.'); exit; }
+$stmt = $adminConnection->prepare('INSERT INTO dialysis_centers (facility_type,name,address,contact_number,email,operating_hours,dialysis_types,image_path,machine_count,available_slots) VALUES (:facility_type,:name,:address,:contact,:email,:hours,:types,:image,:machines,:slots)'); $stmt->execute(['facility_type'=>$facilityType,'name'=>$name,'address'=>$address,'contact'=>$contact,'email'=>$email,'hours'=>$hours,'types'=>$types,'image'=>$imagePath,'machines'=>$machines,'slots'=>$slots]); header('Location: ../centers.php?message=Facility added successfully.'); exit;

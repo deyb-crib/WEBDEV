@@ -37,11 +37,11 @@ require __DIR__ . '/signup_function.php';
                 <form class="auth-form" method="post" action="signup.php">
                     <div class="form-field">
                         <label for="name">Full name</label>
-                        <input type="text" id="name" name="name" value="<?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8') ?>" autocomplete="name" required>
+                        <input type="text" id="name" name="name" value="<?= htmlspecialchars($name, ENT_QUOTES, 'UTF-8') ?>" autocomplete="name" minlength="2" maxlength="100" pattern="[A-Za-zÀ-ÖØ-öø-ÿ .'-]+" required>
                     </div>
                     <div class="form-field">
                         <label for="email">Email address</label>
-                        <input type="email" id="email" name="email" value="<?= htmlspecialchars($email, ENT_QUOTES, 'UTF-8') ?>" autocomplete="email" required>
+                        <input type="email" id="email" name="email" value="<?= htmlspecialchars($email, ENT_QUOTES, 'UTF-8') ?>" maxlength="254" autocomplete="email" required>
                     </div>
                     <div class="form-field">
                         <label for="password">Password</label>

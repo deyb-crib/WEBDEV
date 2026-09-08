@@ -4,7 +4,36 @@ const closeButton = document.querySelector('.sidebar-close');
 const backdrop = document.querySelector('.sidebar-backdrop');
 const cancelModal = document.querySelector('#cancel-modal');
 const confirmCancelButton = document.querySelector('#confirm-cancel-appointment');
+const sidebarLinks = [...document.querySelectorAll('.sidebar-link')];
+const dashboardHeader = document.querySelector('.dashboard-header');
 let pendingCancelForm = null;
+let lastScrollY = window.scrollY;
+
+function syncActiveSidebarLink() {
+    const appointmentsAreActive = window.location.hash === '#appointments';
+    sidebarLinks.forEach((link) => {
+        const isAppointmentsLink = link.getAttribute('href')?.includes('#appointments');
+        link.classList.toggle('is-active', appointmentsAreActive ? isAppointmentsLink : !isAppointmentsLink);
+    });
+}
+
+function handleDashboardHeaderScroll() {
+    if (!dashboardHeader) {
+        return;
+    }
+
+    const currentScrollY = window.scrollY;
+    const shouldHideHeader = currentScrollY > 30 && currentScrollY > lastScrollY;
+
+    dashboardHeader.classList.toggle('is-hidden', shouldHideHeader);
+    dashboardHeader.style.pointerEvents = shouldHideHeader ? 'none' : 'auto';
+    document.body.classList.toggle('dashboard-header-hidden', shouldHideHeader);
+    lastScrollY = currentScrollY;
+}
+
+syncActiveSidebarLink();
+window.addEventListener('hashchange', syncActiveSidebarLink);
+window.addEventListener('scroll', handleDashboardHeaderScroll, { passive: true });
 
 function setSidebarState(isOpen) {
     document.body.classList.toggle('sidebar-open', isOpen);

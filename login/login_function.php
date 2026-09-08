@@ -18,27 +18,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $validation['data']['email'];
 
     if (!$errors) {
+        $user = null;
+
         try {
+            $statement = getMySqlConnection()->prepare(
+                'SELECT id, name, email, password_hash FROM users WHERE email = :email LIMIT 1'
+            );
+            $statement->execute(['email' => $email]);
+            $user = $statement->fetch();
+        } catch (PDOException $exception) {
+            $user = null;
+        }
+
+        if (!$user) {
             $statement = getDatabaseConnection()->prepare(
                 'SELECT id, name, email, password_hash FROM users WHERE email = :email LIMIT 1'
             );
             $statement->execute(['email' => $email]);
             $user = $statement->fetch();
+        }
 
-            if (!$user || !password_verify($validation['data']['password'], $user['password_hash'])) {
-                $errors[] = 'Invalid email or password.';
-            } else {
-                session_regenerate_id(true);
-                $_SESSION['user'] = [
-                    'id' => (int) $user['id'],
-                    'name' => $user['name'],
-                    'email' => $user['email'],
-                ];
-                header('Location: ../dashboard/dashboard.php');
-                exit;
-            }
-        } catch (PDOException $exception) {
-            $errors[] = 'Unable to connect to the user database. Please try again later.';
+        if (!$user || !password_verify($validation['data']['password'], $user['password_hash'])) {
+            $errors[] = 'Invalid email or password.';
+        } else {
+            session_regenerate_id(true);
+            $_SESSION['user'] = [
+                'id' => (int) $user['id'],
+                'name' => $user['name'],
+                'email' => $user['email'],
+            ];
+            header('Location: ../dashboard/dashboard.php');
+            exit;
         }
     }
 }

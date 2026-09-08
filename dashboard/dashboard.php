@@ -8,11 +8,25 @@ if (!isset($_SESSION['user'])) {
 
 $user = $_SESSION['user'];
 require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../config/request.php';
 
 $appointments = [];
-$dashboardMessage = trim((string) ($_GET['message'] ?? ''));
+$upcomingAppointments = [];
+$pastAppointments = [];
+$dashboardMessage = requestText($_GET, 'message', 300);
 try {
     $appointments = getMySqlAppointmentsForUser((int) $user['id']);
+    $today = date('Y-m-d');
+    foreach ($appointments as $appointment) {
+        $isPast = $appointment['appointment_date'] < $today
+            || in_array($appointment['status'], ['Completed', 'Cancelled'], true);
+
+        if ($isPast) {
+            $pastAppointments[] = $appointment;
+        } elseif ($appointment['appointment_date'] >= $today && $appointment['status'] !== 'Cancelled') {
+            $upcomingAppointments[] = $appointment;
+        }
+    }
 } catch (PDOException $exception) {
     $dashboardMessage = 'Appointments are temporarily unavailable. Please try again later.';
 }
@@ -52,7 +66,7 @@ try {
         <nav aria-label="Dashboard navigation">
             <a class="sidebar-link is-active" href="dashboard.php">Dashboard</a>
             <a class="sidebar-link" href="../index.php#services">Find a center</a>
-            <a class="sidebar-link" href="../index.php#appointment">Appointments</a>
+            <a class="sidebar-link" href="dashboard.php#appointments">Appointments</a>
             <a class="sidebar-link" href="../index.php#kidney-care">Kidney care guide</a>
         </nav>
         <a class="sidebar-logout" href="../logout/logout.php">Log out</a>
@@ -100,11 +114,35 @@ try {
             <?php if ($dashboardMessage !== ''): ?>
                 <p class="dashboard-message" role="status"><?= htmlspecialchars($dashboardMessage, ENT_QUOTES, 'UTF-8') ?></p>
             <?php endif; ?>
-            <?php if (!$appointments): ?>
-                <p class="dashboard-empty">You have no appointment requests yet.</p>
-            <?php else: ?>
-                <div class="appointment-list">
-                    <?php foreach ($appointments as $appointment): ?>
+            <?php foreach ([
+                [
+                    'title' => 'Upcoming appointments',
+                    'items' => $upcomingAppointments,
+                    'upcoming' => true,
+                    'emptyTitle' => 'No upcoming appointments',
+                    'emptyText' => "You don't have any upcoming dialysis appointments.",
+                ],
+                [
+                    'title' => 'Past appointments',
+                    'items' => $pastAppointments,
+                    'upcoming' => false,
+                    'emptyTitle' => 'No past appointments',
+                    'emptyText' => 'Your completed or previous appointments will appear here.',
+                ],
+            ] as $appointmentGroup): ?>
+                <div class="appointment-group <?= $appointmentGroup['upcoming'] ? 'appointment-group-upcoming' : 'appointment-group-past' ?>">
+                    <h3 class="appointment-group-title"><?= htmlspecialchars($appointmentGroup['title'], ENT_QUOTES, 'UTF-8') ?></h3>
+                    <?php if (!$appointmentGroup['items']): ?>
+                        <div class="dashboard-empty appointment-empty-state">
+                            <strong><?= htmlspecialchars($appointmentGroup['emptyTitle'], ENT_QUOTES, 'UTF-8') ?></strong>
+                            <p><?= htmlspecialchars($appointmentGroup['emptyText'], ENT_QUOTES, 'UTF-8') ?></p>
+                            <?php if ($appointmentGroup['upcoming']): ?>
+                                <a class="appointment-action" href="../index.php#services">Find a Dialysis Center</a>
+                            <?php endif; ?>
+                        </div>
+                    <?php else: ?>
+                        <div class="appointment-list">
+                    <?php foreach ($appointmentGroup['items'] as $appointment): ?>
                         <?php $statusClass = strtolower((string) preg_replace('/[^a-z0-9]+/i', '-', $appointment['status'])); ?>
                         <article class="appointment-card">
                             <div class="appointment-card-header">
@@ -116,9 +154,10 @@ try {
                             </div>
                             <div class="appointment-card-details">
                                 <p><strong>Location</strong><span><?= htmlspecialchars($appointment['center_location'], ENT_QUOTES, 'UTF-8') ?></span></p>
-                                <p><strong>Date</strong><span><?= htmlspecialchars($appointment['appointment_date'], ENT_QUOTES, 'UTF-8') ?></span></p>
-                                <p><strong>Time</strong><span><?= htmlspecialchars(substr($appointment['appointment_time'], 0, 5), ENT_QUOTES, 'UTF-8') ?></span></p>
+                                <p><strong>Date</strong><span><?= htmlspecialchars(date('F j, Y', strtotime($appointment['appointment_date'])), ENT_QUOTES, 'UTF-8') ?></span></p>
+                                <p><strong>Time</strong><span><?= htmlspecialchars(date('g:i A', strtotime($appointment['appointment_time'])), ENT_QUOTES, 'UTF-8') ?></span></p>
                                 <p><strong>Dialysis Type</strong><span><?= htmlspecialchars($appointment['dialysis_type'], ENT_QUOTES, 'UTF-8') ?></span></p>
+                                <p><strong>Patient Name</strong><span><?= htmlspecialchars($appointment['patient_name'], ENT_QUOTES, 'UTF-8') ?></span></p>
                             </div>
                             <details class="appointment-details">
                                 <summary>View Details</summary>
@@ -126,7 +165,7 @@ try {
                                 <p>Contact: <?= htmlspecialchars($appointment['contact_number'], ENT_QUOTES, 'UTF-8') ?></p>
                                 <p>Session: <?= htmlspecialchars($appointment['session'], ENT_QUOTES, 'UTF-8') ?></p>
                             </details>
-                            <?php if (in_array($appointment['status'], ['Pending Confirmation', 'Confirmed'], true)): ?>
+                            <?php if ($appointmentGroup['upcoming'] && in_array($appointment['status'], ['Pending Confirmation', 'Confirmed'], true)): ?>
                                 <div class="appointment-actions">
                                     <form method="post" action="appointment_action.php" class="cancel-appointment-form">
                                         <input type="hidden" name="csrf_token" value="<?= htmlspecialchars(getCsrfToken(), ENT_QUOTES, 'UTF-8') ?>">
@@ -150,8 +189,10 @@ try {
                             <?php endif; ?>
                         </article>
                     <?php endforeach; ?>
+                            </div>
+                    <?php endif; ?>
                 </div>
-            <?php endif; ?>
+            <?php endforeach; ?>
         </section>
     </main>
     <div class="cancel-modal" id="cancel-modal" aria-hidden="true">
@@ -165,6 +206,27 @@ try {
             </div>
         </div>
     </div>
-    <script src="dashboard.js"></script>
+    <script>
+        (() => {
+            const header = document.querySelector('.dashboard-header');
+            if (!header) {
+                return;
+            }
+
+            let previousScrollY = window.scrollY || 0;
+
+            const updateHeaderState = () => {
+                const currentScrollY = window.scrollY || 0;
+                const shouldHideHeader = currentScrollY > 30 && currentScrollY > previousScrollY;
+
+                header.classList.toggle('is-hidden', shouldHideHeader);
+                header.style.pointerEvents = shouldHideHeader ? 'none' : 'auto';
+                document.body.classList.toggle('dashboard-header-hidden', shouldHideHeader);
+                previousScrollY = currentScrollY;
+            };
+
+            window.addEventListener('scroll', updateHeaderState, { passive: true });
+        })();
+    </script>
 </body>
 </html>

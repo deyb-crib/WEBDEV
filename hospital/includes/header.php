@@ -1,0 +1,4 @@
+<?php
+$hospitalAdmin = $hospitalAdmin ?? requireHospitalAdmin();
+$hospitalPageTitle = $hospitalPageTitle ?? 'Hospital Dashboard';
+?><!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title><?= htmlspecialchars($hospitalPageTitle, ENT_QUOTES, 'UTF-8') ?> | KATOC</title><link rel="stylesheet" href="../admin/css/admin.css"></head><body class="admin-page"><?php require __DIR__ . '/sidebar.php'; ?><div class="admin-shell"><header class="admin-topbar"><div><span class="admin-kicker">KATOC HOSPITAL ADMIN</span><h1><?= htmlspecialchars($hospitalPageTitle, ENT_QUOTES, 'UTF-8') ?></h1></div><span class="admin-user-label"><?= htmlspecialchars($hospitalAdmin['name'], ENT_QUOTES, 'UTF-8') ?></span></header><main class="admin-main">
